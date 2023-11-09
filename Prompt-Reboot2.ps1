@@ -2,6 +2,7 @@ Add-Type -AssemblyName PresentationFramework
 $defer = $true
 $deferals = 0
 while($defer) {
+    Set-ForegroundWindow (Get-Process PowerShell).MainWindowHandle
     $answer = [System.Windows.MessageBox]::Show("To complete VPN install your computer must reboot, reboot now or defer? (You can defer up to 2 times)", "Forticlient EMS Installation", [System.Windows.MessageBoxButton]::YesNo)
     if ($answer -eq "Yes") {
         # Do something if the user enters 'Yes'
