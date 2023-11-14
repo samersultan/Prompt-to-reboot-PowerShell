@@ -1,3 +1,7 @@
+# Taken from https://modalyitblog.wordpress.com/2016/10/03/powershell-gui-reboot-prompt/
+
+# Ninja One Notes: https://ninjarmm.zendesk.com/hc/en-us/community/posts/6374538061325-End-User-Reboot-Prompt
+
 <#
  .NOTES
  --------------------------------------------------------------------------------
