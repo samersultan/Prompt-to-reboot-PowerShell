@@ -2,6 +2,7 @@
 
 # Ninja One Notes: https://ninjarmm.zendesk.com/hc/en-us/community/posts/6374538061325-End-User-Reboot-Prompt
 
+
 <#
  .NOTES
  --------------------------------------------------------------------------------
@@ -13,7 +14,7 @@
  Provides an reboot prompt which counts down from 3 minutes and allows the
  end user to schedule or cancel the reboot.
 #>
- 
+
 #----------------------------------------------
 #region Import Assemblies
 #----------------------------------------------
@@ -90,7 +91,7 @@ function Call-MainForm_psf
  #----------------------------------------------
  # User Generated Script
  #----------------------------------------------
- $TotalTime = 180 #in seconds
+ $TotalTime = 300 #in seconds
  
  $MainForm_Load={
  #TODO: Initialize Form Controls here
@@ -122,7 +123,7 @@ function Call-MainForm_psf
  
  $ButtonSchedule_Click={
  # Schedule restart for 6pm
- (schtasks /create /sc once /tn "Post Maintenance Restart" /tr "shutdown - r -f ""restart""" /st 18:00 /f)
+ (schtasks /create /sc once /tn "Redémarrage du PC" /tr "shutdown - r -f ""restart""" /st 18:00 /f)
  $MainForm.Close()
  }
  
@@ -208,7 +209,7 @@ function Call-MainForm_psf
  $MainForm.ShowIcon = $False
  $MainForm.ShowInTaskbar = $False
  $MainForm.StartPosition = 'CenterScreen'
- $MainForm.Text = 'Systems Maintenance'
+ $MainForm.Text = 'System Maintenance'
  $MainForm.TopMost = $True
  $MainForm.add_Load($MainForm_Load)
  #
@@ -241,7 +242,7 @@ function Call-MainForm_psf
  $ButtonSchedule.Name = 'ButtonSchedule'
  $ButtonSchedule.Size = '105, 45'
  $ButtonSchedule.TabIndex = 6
- $ButtonSchedule.Text = 'Schedule - 6pm'
+ $ButtonSchedule.Text = 'Restart at 6pm'
  $ButtonSchedule.UseVisualStyleBackColor = $True
  $ButtonSchedule.add_Click($ButtonSchedule_Click)
  #
@@ -260,7 +261,7 @@ function Call-MainForm_psf
  # panel1
  #
  $panel1.Controls.Add($labelITSystemsMaintenance)
- $panel1.BackColor = '0, 114, 198'
+ $panel1.BackColor = '43, 66, 89'
  $panel1.Location = '0, 0'
  $panel1.Name = 'panel1'
  $panel1.Size = '375, 67'
@@ -268,13 +269,13 @@ function Call-MainForm_psf
  #
  # labelITSystemsMaintenance
  #
- $labelITSystemsMaintenance.Font = 'Microsoft Sans Serif, 14.25pt'
+ $labelITSystemsMaintenance.Font = 'Microsoft Sans Serif, 18pt, style=Bold'
  $labelITSystemsMaintenance.ForeColor = 'White'
  $labelITSystemsMaintenance.Location = '11, 18'
  $labelITSystemsMaintenance.Name = 'labelITSystemsMaintenance'
- $labelITSystemsMaintenance.Size = '269, 23'
+ $labelITSystemsMaintenance.Size = '350, 23'
  $labelITSystemsMaintenance.TabIndex = 1
- $labelITSystemsMaintenance.Text = 'IT Systems Maintenance'
+ $labelITSystemsMaintenance.Text = 'NinjaOne'
  $labelITSystemsMaintenance.TextAlign = 'MiddleLeft'
  $labelITSystemsMaintenance.add_Click($labelITSystemsMaintenance_Click)
  #
@@ -286,7 +287,7 @@ function Call-MainForm_psf
  $labelSecondsLeftToRestart.Name = 'labelSecondsLeftToRestart'
  $labelSecondsLeftToRestart.Size = '155, 15'
  $labelSecondsLeftToRestart.TabIndex = 5
- $labelSecondsLeftToRestart.Text = 'Seconds left to restart :'
+ $labelSecondsLeftToRestart.Text = 'Time left :'
  #
  # labelTime
  #
@@ -308,9 +309,9 @@ function Call-MainForm_psf
  $labelInOrderToApplySecuri.Name = 'labelInOrderToApplySecuri'
  $labelInOrderToApplySecuri.Size = '350, 83'
  $labelInOrderToApplySecuri.TabIndex = 2
- $labelInOrderToApplySecuri.Text = 'In order to apply security patches and updates for your system, your machine must be restarted. 
+ $labelInOrderToApplySecuri.Text = 'In order to apply security patches and updates to your system, your machine must be restarted.
  
-If you do not wish to restart you computer at this time please click on the cancel button below.'
+If you do not wish to restart your computer at this time, please click the cancel button below.'
  #
  # timerUpdate
  #
