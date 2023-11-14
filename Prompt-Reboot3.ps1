@@ -1,8 +1,3 @@
-# Taken from https://modalyitblog.wordpress.com/2016/10/03/powershell-gui-reboot-prompt/
-
-# Ninja One Notes: https://ninjarmm.zendesk.com/hc/en-us/community/posts/6374538061325-End-User-Reboot-Prompt
-
-
 <#
  .NOTES
  --------------------------------------------------------------------------------
@@ -105,8 +100,10 @@ function Call-MainForm_psf
  $timerUpdate_Tick={
  # Define countdown timer
  [TimeSpan]$span = $script:StartTime - (Get-Date)
- #Update the display
- $labelTime.Text = "{0:N0}" -f $span.TotalSeconds
+ # Update the display
+ $mins = "{0:00}" -f $span.Minutes
+ $secs = "{0:00}" -f $span.Seconds
+ $labelTime.Text = "{0}:{1}" -f $mins, $secs
  $timerUpdate.Start()
  if ($span.TotalSeconds -le 0)
  {
@@ -122,8 +119,19 @@ function Call-MainForm_psf
  }
  
  $ButtonSchedule_Click={
- # Schedule restart for 6pm
- (schtasks /create /sc once /tn "Redémarrage du PC" /tr "shutdown - r -f ""restart""" /st 18:00 /f)
+ # Schedule restart for 11pm
+ #remove old task
+ Unregister-ScheduledTask -TaskName "RetterTEK Reboot" -Confirm:$false
+ # Create task action
+ $taskAction = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument 'shutdown /r /f /t 300'
+ # Create a trigger
+ $taskTrigger = New-ScheduledTaskTrigger -Once -At 23:00pm
+ # The name of the scheduled task.
+ $taskName = "RetterTEK Reboot"
+ # Describe the scheduled task.
+ $description = "Force reboot the computer at 11pm"
+ # Register the scheduled task
+ Register-ScheduledTask -TaskName $taskName -Action $taskAction -Trigger $taskTrigger -Description $description 
  $MainForm.Close()
  }
  
@@ -168,7 +176,6 @@ function Call-MainForm_psf
  #Remove all event handlers from the controls
  try
  {
- $ButtonCancel.remove_Click($buttonCancel_Click)
  $ButtonSchedule.remove_Click($ButtonSchedule_Click)
  $ButtonRestartNow.remove_Click($ButtonRestartNow_Click)
  $panel2.remove_Paint($panel2_Paint)
@@ -194,6 +201,7 @@ function Call-MainForm_psf
  #
  # MainForm
  #
+ $MainForm.ControlBox = $False
  $MainForm.Controls.Add($panel2)
  $MainForm.Controls.Add($panel1)
  $MainForm.Controls.Add($labelSecondsLeftToRestart)
@@ -215,7 +223,6 @@ function Call-MainForm_psf
  #
  # panel2
  #
- $panel2.Controls.Add($ButtonCancel)
  $panel2.Controls.Add($ButtonSchedule)
  $panel2.Controls.Add($ButtonRestartNow)
  $panel2.BackColor = 'ScrollBar'
@@ -225,24 +232,14 @@ function Call-MainForm_psf
  $panel2.TabIndex = 9
  $panel2.add_Paint($panel2_Paint)
  #
- # ButtonCancel
- #
- $ButtonCancel.Location = '250, 17'
- $ButtonCancel.Name = 'ButtonCancel'
- $ButtonCancel.Size = '77, 45'
- $ButtonCancel.TabIndex = 7
- $ButtonCancel.Text = 'Cancel'
- $ButtonCancel.UseVisualStyleBackColor = $True
- $ButtonCancel.add_Click($buttonCancel_Click)
- #
  # ButtonSchedule
  #
  $ButtonSchedule.Font = 'Microsoft Sans Serif, 8.25pt, style=Bold'
- $ButtonSchedule.Location = '139, 17'
+ $ButtonSchedule.Location = '175, 17'
  $ButtonSchedule.Name = 'ButtonSchedule'
  $ButtonSchedule.Size = '105, 45'
  $ButtonSchedule.TabIndex = 6
- $ButtonSchedule.Text = 'Restart at 6pm'
+ $ButtonSchedule.Text = 'Restart at 11pm'
  $ButtonSchedule.UseVisualStyleBackColor = $True
  $ButtonSchedule.add_Click($ButtonSchedule_Click)
  #
@@ -250,7 +247,7 @@ function Call-MainForm_psf
  #
  $ButtonRestartNow.Font = 'Microsoft Sans Serif, 8.25pt, style=Bold'
  $ButtonRestartNow.ForeColor = 'DarkRed'
- $ButtonRestartNow.Location = '42, 17'
+ $ButtonRestartNow.Location = '75, 17'
  $ButtonRestartNow.Name = 'ButtonRestartNow'
  $ButtonRestartNow.Size = '91, 45'
  $ButtonRestartNow.TabIndex = 0
@@ -261,7 +258,7 @@ function Call-MainForm_psf
  # panel1
  #
  $panel1.Controls.Add($labelITSystemsMaintenance)
- $panel1.BackColor = '43, 66, 89'
+ $panel1.BackColor = '51, 51, 51'
  $panel1.Location = '0, 0'
  $panel1.Name = 'panel1'
  $panel1.Size = '375, 67'
@@ -269,13 +266,13 @@ function Call-MainForm_psf
  #
  # labelITSystemsMaintenance
  #
- $labelITSystemsMaintenance.Font = 'Microsoft Sans Serif, 18pt, style=Bold'
- $labelITSystemsMaintenance.ForeColor = 'White'
+ $labelITSystemsMaintenance.Font = 'Book Antiqua, 18pt, style=Bold'
+ $labelITSystemsMaintenance.ForeColor = 'Gold'
  $labelITSystemsMaintenance.Location = '11, 18'
  $labelITSystemsMaintenance.Name = 'labelITSystemsMaintenance'
  $labelITSystemsMaintenance.Size = '350, 23'
  $labelITSystemsMaintenance.TabIndex = 1
- $labelITSystemsMaintenance.Text = 'NinjaOne'
+ $labelITSystemsMaintenance.Text = 'RetterTEK'
  $labelITSystemsMaintenance.TextAlign = 'MiddleLeft'
  $labelITSystemsMaintenance.add_Click($labelITSystemsMaintenance_Click)
  #
@@ -287,14 +284,14 @@ function Call-MainForm_psf
  $labelSecondsLeftToRestart.Name = 'labelSecondsLeftToRestart'
  $labelSecondsLeftToRestart.Size = '155, 15'
  $labelSecondsLeftToRestart.TabIndex = 5
- $labelSecondsLeftToRestart.Text = 'Time left :'
+ $labelSecondsLeftToRestart.Text = 'Auto Reboot In :'
  #
  # labelTime
  #
  $labelTime.AutoSize = $True
  $labelTime.Font = 'Microsoft Sans Serif, 9pt, style=Bold'
  $labelTime.ForeColor = '192, 0, 0'
- $labelTime.Location = '237, 176'
+ $labelTime.Location = '190, 174'
  $labelTime.Name = 'labelTime'
  $labelTime.Size = '43, 15'
  $labelTime.TabIndex = 3
@@ -309,9 +306,9 @@ function Call-MainForm_psf
  $labelInOrderToApplySecuri.Name = 'labelInOrderToApplySecuri'
  $labelInOrderToApplySecuri.Size = '350, 83'
  $labelInOrderToApplySecuri.TabIndex = 2
- $labelInOrderToApplySecuri.Text = 'In order to apply security patches and updates to your system, your machine must be restarted.
- 
-If you do not wish to restart your computer at this time, please click the cancel button below.'
+ $labelInOrderToApplySecuri.Text = 'Your machine exceeds 15 days of uptime.
+
+For optimal system performance, please save your work and restart your machine.'
  #
  # timerUpdate
  #
